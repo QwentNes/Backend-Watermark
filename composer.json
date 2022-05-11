@@ -1,0 +1,15 @@
+{
+    "config": {
+        "platform": {
+            "php": "8.1"
+        }
+    },
+    "require": {
+        "leafs/leaf": "^3.0",
+        "leafs/form": "^1.2",
+        "leafs/fs": "^1.0",
+        "leafs/http": "^1.2",
+        "ext-gd": "*",
+        "leafs/cors": "^1.0"
+    }
+}
