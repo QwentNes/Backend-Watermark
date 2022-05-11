@@ -29,8 +29,10 @@ class Watermark
             $this->ground = imagecreatefrompng(IMAGE_PATH . $this->name);
             $this->resizeMark();
             $this->acceptPresets();
-        } catch (Exception) {
-            Leaf\Http\Headers::status(500);
+        } catch (Exception $e) {
+            response()->json([
+                'error' => $e,
+            ], 500);
             die();
         }
     }

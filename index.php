@@ -7,18 +7,30 @@ require_once("classes/Image.php");
 require_once("classes/Project.php");
 require_once("classes/Watermark.php");
 
-Leaf\Http\Headers::accessControl("Allow-Origin", "*", 200);
-Leaf\Http\Headers::accessControl("Allow-Headers", "*", 200);
+Leaf\Http\Headers::accessControl("Allow-Origin", "*");
+Leaf\Http\Headers::accessControl("Allow-Headers", "*");
 
 
 app()->post("/project/save", function () {
     $data = request()->body();
-    $project = new Project($data['project'], 'save');
-    foreach ($data['layers'] as $layer) {
-        $watermark = new Watermark($layer);
-        $project->merge($watermark);
+    if(isset($data['project']) && isset($data['layers'])){
+        $project = new Project($data['project'], 'save');
+        foreach ($data['layers'] as $layer) {
+            $watermark = new Watermark($layer);
+            $project->merge($watermark);
+        }
+        response()->json($project->save());
+        return;
     }
-    response()->json($project->save());
+    response()->json([
+        'error' => 'bad request',
+    ], 500);
+});
+
+app()->post("/create/project", function () {
+    $project = new Project(request()->body());
+    sleep(3);
+    response()->json($project->init());
 });
 
 app()->post("/resource/upload", function () {
@@ -26,16 +38,10 @@ app()->post("/resource/upload", function () {
     $data = request()->body();
     foreach ($data as $item) {
         $image = new Image($item);
-        $response[] = $image->uploadImage();
+        $response[] = $image->upload();
     }
     sleep(3);
     response()->json($response);
-});
-
-app()->post("/create/project", function () {
-    $project = new Project(request()->body());
-    sleep(3);
-    response()->json($project->init());
 });
 
 app()->get("/uploads/{image}", function ($image) {

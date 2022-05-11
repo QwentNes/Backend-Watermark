@@ -1,34 +1,37 @@
 <?php
 
-class Project extends Image
+class Project
 {
     private $project;
+    private $image;
+    private $ground;
 
     public function __construct($data, $mode = 'create')
     {
         if ($mode == 'create') {
             $this->project = Leaf\Form::sanitizeInput($data["Project_name"]);
-            parent::__construct($data["Workspace_image"]);
+            $this->image = new Image($data["Workspace_image"]);
         }
+
         if ($mode == 'save') {
-            $this->size = $data['size'];
             $this->project = $data['name'];
-            $this->name = $data['image'];
-            $this->ground = imagecreatefrompng(IMAGE_PATH . $this->name);
+            $this->ground = imagecreatefrompng(IMAGE_PATH .  $data['image']);
         }
     }
 
     public function init()
     {
         try {
-            $uploader = $this->uploadImage();
+            $uploader = $this->image->upload();
             return [
                 'name' => $this->project,
                 'link' => $uploader['link'],
                 'size' => $uploader['size']
             ];
         } catch (Exception $e) {
-            Leaf\Http\Headers::status(500);
+            response()->json([
+                'error' => $e,
+            ], 500);
             die();
         }
     }

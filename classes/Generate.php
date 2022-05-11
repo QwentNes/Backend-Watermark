@@ -14,7 +14,6 @@ class Generate {
 
   public static function image($path){
       if(file_exists($path)){
-          Leaf\Http\Headers::status(200);
           header('Content-type: image/png');
           $img = imagecreatefrompng($path);
           imagealphablending($img, false);
@@ -23,8 +22,7 @@ class Generate {
           imagedestroy($img);
       }
       else{
-          Leaf\Http\Headers::status(404);
-          echo "uploads not found";
+          response()->markup("Not found", 404);
       }
   }
 }

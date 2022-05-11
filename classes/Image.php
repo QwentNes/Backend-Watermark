@@ -13,18 +13,26 @@ class Image{
        $this->uploadData = $image;
    }
 
-   public function uploadImage(){
-       Leaf\FS::uploadFile($this->uploadData, IMAGE_PATH);
-       $oldPath = IMAGE_PATH.$this->uploadData['name'];
-       $this->type = $this->getType($oldPath);
-       $this->currentPath = $this->name.".".$this->type;
-       Leaf\FS::renameFile($oldPath, IMAGE_PATH.$this->currentPath);
-       $this->reType();
-       $this->getSize();
-       return ([
-           "link" => $this->currentPath,
-           "size" => $this->getSize(),
-       ]);
+   public function upload(){
+       try {
+           Leaf\FS::uploadFile($this->uploadData, IMAGE_PATH);
+           $oldPath = IMAGE_PATH.$this->uploadData['name'];
+           $this->type = $this->getType($oldPath);
+           $this->currentPath = $this->name.".".$this->type;
+           Leaf\FS::renameFile($oldPath, IMAGE_PATH.$this->currentPath);
+           $this->reType();
+           $this->getSize();
+           return ([
+               "link" => $this->currentPath,
+               "size" => $this->getSize(),
+           ]);
+       }
+       catch (Exception $e){
+           response()->json([
+               'error' => $e,
+           ], 500);
+           die();
+       }
    }
 
    protected function getType($path){
